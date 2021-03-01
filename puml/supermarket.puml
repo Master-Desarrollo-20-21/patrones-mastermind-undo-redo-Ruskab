@@ -1,0 +1,82 @@
+@startuml
+class EspTicket  {
+    + addLine(ReturnLine line)
+}
+class FraTicket
+
+abstract Ticket #APPLICATION {
+    - ticketStartDateTime
+    - supermarketChainName
+    + addLine(SoldLine line)
+    + addLine(RepeatLine line)
+    + addLine(CancellationLine line)
+}
+
+abstract Line #APPLICATION {
+}
+class SoldLine {
+    code : String
+    description : String
+    units : long
+    price : double
+}
+class RepeatLine {
+    + RepeatLine(Line line)
+}
+class CancellationLine {
+    + CancellationLine(Line line)
+}
+class ReturnLine
+
+abstract CountryFactory <<Abstract Factory>> #APPLICATION{
+    + createOperations() : Operations
+    + createTicket() : Ticket
+}
+class EspCountryFactory <<Concrete Factory>>
+class FraCountryFactory <<Concrete Factory>>
+abstract Operations #APPLICATION {
+    + showInDisplay(Ticket ticket) :void
+    + calculatePrice(Ticket ticket) : double
+    + calculatePrice(Line line)
+    + showInDisplay(Line line)
+    + print(Line line)
+}
+class EspOperations {
+    + showInDisplay(Ticket ticket) : void
+    + applyDiscount(Discount discount, Line line)
+}
+class FraOperations {
+    + applyGlobalDiscount(Discount discount, Ticket ticket)
+}
+
+
+'-----------------------------------------------
+
+Ticket *-- "*" Line
+
+EspTicket -up-|> Ticket
+FraTicket -up-|> Ticket
+
+SoldLine -up-|> Line
+RepeatLine -up-|> Line
+CancellationLine -up-|> Line
+ReturnLine -up-|> Line
+
+EspCountryFactory -up-|> CountryFactory
+FraCountryFactory -up-|> CountryFactory
+
+EspOperations -up-|> Operations
+FraOperations -up-|> Operations
+
+CountryFactory ..> Operations
+CountryFactory ..> Ticket
+Operations ...> Ticket
+Operations ..> Line
+EspCountryFactory ..> EspOperations
+EspCountryFactory ..> EspTicket
+FraCountryFactory ..> FraOperations
+FraCountryFactory ..> FraTicket
+
+Client -right-> CountryFactory
+Client --> Operations
+@enduml
